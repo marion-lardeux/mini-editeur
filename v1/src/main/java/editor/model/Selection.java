@@ -1,6 +1,5 @@
 package editor.model;
 
-/** Deux positions dans le texte : début et fin. Si début = fin, c'est un simple curseur. */
 public class Selection {
     private int start = 0;
     private int end = 0;

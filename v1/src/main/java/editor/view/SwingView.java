@@ -16,9 +16,7 @@ import editor.model.EditorObserver;
 import editor.model.EditorReader;
 
 public class SwingView implements EditorObserver {
-    private static final Highlighter.HighlightPainter SELECTION_PAINTER =
-            new DefaultHighlighter.DefaultHighlightPainter(new Color(0x9EC9FF));
-
+    private static final Highlighter.HighlightPainter SELECTION_PAINTER = new DefaultHighlighter.DefaultHighlightPainter(new Color(0x9EC9FF));
     private final EditorReader reader;
     private final EditorPane pane = new EditorPane();
 

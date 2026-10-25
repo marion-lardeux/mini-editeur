@@ -1,18 +1,12 @@
 package editor.model;
-
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Façade du modèle. À cette étape elle ne sait qu'insérer du texte, exposer son état en
- * lecture seule (EditorReader) et prévenir ses observateurs.
- */
 public class EditorEngine implements EditorReader {
     private final Buffer buffer = new Buffer();
     private final Selection selection = new Selection();
     private final List<EditorObserver> observers = new ArrayList<>();
 
-    /** Insère le texte à la position du curseur. */
     public void insert(String s) {
         if (s == null || s.isEmpty()) {
             return;
@@ -21,6 +15,26 @@ public class EditorEngine implements EditorReader {
         buffer.insert(pos, s);
         int newPos = pos + s.length();
         selection.set(newPos, newPos);
+        notifyObservers();
+    }
+
+    public void delete() {
+        int start = selection.getStart();
+        int end = selection.getEnd();
+        if (selection.isEmpty()) {
+            if (start >= buffer.length()) {
+                return;
+            }
+            end = start + 1;
+        }
+        buffer.delete(start, end);
+        selection.set(start, start);
+        notifyObservers();
+    }
+
+    public void moveCursor(int delta) {
+        int pos = clamp(selection.getStart() + delta, 0, buffer.length());
+        selection.set(pos, pos);
         notifyObservers();
     }
 
@@ -47,5 +61,9 @@ public class EditorEngine implements EditorReader {
     @Override
     public int getSelEnd() {
         return selection.getEnd();
+    }
+
+    private static int clamp(int i, int min, int max) {
+        return Math.max(min, Math.min(max, i));
     }
 }
