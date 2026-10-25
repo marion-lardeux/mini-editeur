@@ -1,21 +1,44 @@
 package editor.model;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class EditorEngine implements EditorReader {
     private final Buffer buffer = new Buffer();
     private final Selection selection = new Selection();
+    private final Clipboard clipboard = new Clipboard();
     private final List<EditorObserver> observers = new ArrayList<>();
 
-    public void insert(String s) {
-        if (s == null || s.isEmpty()) {
+    public void copy() {
+        if (selection.isEmpty()) {
             return;
         }
-        int pos = selection.getStart();
-        buffer.insert(pos, s);
-        int newPos = pos + s.length();
-        selection.set(newPos, newPos);
+        clipboard.set(buffer.substring(selection.getStart(), selection.getEnd()));
+    }
+
+    public void cut() {
+        if (selection.isEmpty()) {
+            return;
+        }
+        copy();
+        int start = selection.getStart();
+        buffer.delete(start, selection.getEnd());
+        selection.set(start, start);
         notifyObservers();
+    }
+
+    public void paste() {
+        if (clipboard.isEmpty()) {
+            return;
+        }
+        replaceSelection(clipboard.get());
+    }
+
+    public void insert(String s) {
+        if (s == null || (s.isEmpty() && selection.isEmpty())) {
+            return;
+        }
+        replaceSelection(s);
     }
 
     public void delete() {
@@ -33,8 +56,21 @@ public class EditorEngine implements EditorReader {
     }
 
     public void moveCursor(int delta) {
-        int pos = clamp(selection.getStart() + delta, 0, buffer.length());
+        int pos;
+        if (selection.isEmpty()) {
+            pos = clamp(selection.getStart() + delta, 0, buffer.length());
+        } else {
+            pos = (delta < 0) ? selection.getStart() : selection.getEnd();
+        }
         selection.set(pos, pos);
+        notifyObservers();
+    }
+
+    public void extendSelection(int delta) {
+        int anchor = selection.getAnchor();
+        int active = (selection.getStart() == anchor) ? selection.getEnd() : selection.getStart();
+        int newActive = clamp(active + delta, 0, buffer.length());
+        selection.select(anchor, newActive);
         notifyObservers();
     }
 
@@ -61,6 +97,15 @@ public class EditorEngine implements EditorReader {
     @Override
     public int getSelEnd() {
         return selection.getEnd();
+    }
+
+    private void replaceSelection(String s) {
+        int start = selection.getStart();
+        buffer.delete(start, selection.getEnd());
+        buffer.insert(start, s);
+        int pos = start + s.length();
+        selection.set(pos, pos);
+        notifyObservers();
     }
 
     private static int clamp(int i, int min, int max) {

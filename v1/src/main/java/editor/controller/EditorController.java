@@ -9,6 +9,18 @@ public class EditorController {
         this.engine = engine;
     }
 
+    public void copy() {
+        engine.copy();
+    }
+
+    public void cut() {
+        engine.cut();
+    }
+
+    public void paste() {
+        engine.paste();
+    }
+
     public void insert(String s) {
         engine.insert(s);
     }
@@ -19,5 +31,9 @@ public class EditorController {
 
     public void moveCursor(int delta) {
         engine.moveCursor(delta);
+    }
+
+    public void extendSelection(int delta) {
+        engine.extendSelection(delta);
     }
 }

@@ -17,7 +17,7 @@ import editor.view.SwingView;
 
 public class Main {
     private static final String HELP =
-            "Frappe : saisir  |  ←/→ : curseur  |  Suppr : supprimer le caractère suivant";
+            "←/→ : curseur  |  Maj+←/→ : sélectionner  |  Suppr : supprimer  |  Ctrl+C/X/V : copier, couper, coller";
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(Main::start);

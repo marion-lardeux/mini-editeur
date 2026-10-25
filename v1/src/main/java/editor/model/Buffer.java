@@ -11,6 +11,10 @@ public class Buffer {
         content.delete(start, end);
     }
 
+    public String substring(int start, int end) {
+        return content.substring(start, end);
+    }
+
     public int length() {
         return content.length();
     }

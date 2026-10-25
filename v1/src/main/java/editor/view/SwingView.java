@@ -61,7 +61,6 @@ public class SwingView implements EditorObserver {
 
     private static class EditorPane extends JTextPane {
         private int cursorPosition = -1;
-
         void setCursorPosition(int position) {
             this.cursorPosition = position;
             repaint();
