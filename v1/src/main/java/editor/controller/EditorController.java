@@ -25,8 +25,8 @@ public class EditorController {
         engine.insert(s);
     }
 
-    public void delete() {
-        engine.delete();
+    public void backspace() {
+        engine.backspace();
     }
 
     public void moveCursor(int delta) {

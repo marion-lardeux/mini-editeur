@@ -31,7 +31,7 @@ public class KeyboardHandler {
         bind(inputMap, actionMap, KeyEvent.VK_C, shortcut, "copy", controller::copy);
         bind(inputMap, actionMap, KeyEvent.VK_X, shortcut, "cut", controller::cut);
         bind(inputMap, actionMap, KeyEvent.VK_V, shortcut, "paste", controller::paste);
-        bind(inputMap, actionMap, KeyEvent.VK_DELETE, 0, "delete", controller::delete);
+        bind(inputMap, actionMap, KeyEvent.VK_BACK_SPACE, 0, "backspace", controller::backspace);
         bind(inputMap, actionMap, KeyEvent.VK_RIGHT, 0, "cursorRight", () -> controller.moveCursor(1));
         bind(inputMap, actionMap, KeyEvent.VK_LEFT, 0, "cursorLeft", () -> controller.moveCursor(-1));
         bind(inputMap, actionMap, KeyEvent.VK_RIGHT, InputEvent.SHIFT_DOWN_MASK, "extendRight", () -> controller.extendSelection(1));

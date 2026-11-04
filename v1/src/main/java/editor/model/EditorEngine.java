@@ -10,16 +10,12 @@ public class EditorEngine implements EditorReader {
     private final List<EditorObserver> observers = new ArrayList<>();
 
     public void copy() {
-        if (selection.isEmpty()) {
-            return;
-        }
+        if (selection.isEmpty()) {return;}
         clipboard.set(buffer.substring(selection.getStart(), selection.getEnd()));
     }
 
     public void cut() {
-        if (selection.isEmpty()) {
-            return;
-        }
+        if (selection.isEmpty()) {return;}
         copy();
         int start = selection.getStart();
         buffer.delete(start, selection.getEnd());
@@ -28,9 +24,7 @@ public class EditorEngine implements EditorReader {
     }
 
     public void paste() {
-        if (clipboard.isEmpty()) {
-            return;
-        }
+        if (clipboard.isEmpty()) {return;}
         replaceSelection(clipboard.get());
     }
 
@@ -41,14 +35,15 @@ public class EditorEngine implements EditorReader {
         replaceSelection(s);
     }
 
-    public void delete() {
+    public void backspace() {
         int start = selection.getStart();
         int end = selection.getEnd();
         if (selection.isEmpty()) {
-            if (start >= buffer.length()) {
+            if (start == 0) {
                 return;
             }
-            end = start + 1;
+            end = start;
+            start = start - 1;
         }
         buffer.delete(start, end);
         selection.set(start, start);
