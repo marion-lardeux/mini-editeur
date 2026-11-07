@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-/** Le moteur se teste sans aucune interface graphique (intérêt du MVC). */
 class EditorEngineTest {
     private final EditorEngine e = new EditorEngine();
 
