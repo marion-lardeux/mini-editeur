@@ -18,7 +18,7 @@ import editor.view.SwingView;
 
 public class Main {
     private static final String HELP = "←/→ : curseur  |  Maj+←/→ : sélectionner  |  ⌫ : supprimer  |  Ctrl+C/X/V : copier, couper, coller  |  \n Ctrl+Z/Y : défaire, refaire  |  Ctrl+R : enregistrer  |  Ctrl+P : rejouer";
-    // private static final String HELP = "<html>←/→ : curseur  |  Maj+←/→ : sélectionner  |  ⌫ : supprimer  |  Ctrl+C/X/V : copier, couper, coller<br>"+ "Ctrl+Z/Y : défaire, refaire  |  Ctrl+R : enregistrer (de nouveau pour arrêter)  |  Ctrl+P : rejouer</html>";
+    
     public static void main(String[] args) {
         SwingUtilities.invokeLater(Main::start);
     }
