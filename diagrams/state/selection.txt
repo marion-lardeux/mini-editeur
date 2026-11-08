@@ -1,0 +1,21 @@
+@startuml
+title États de la Selection (v1 + v2)
+skinparam nodesep 80
+skinparam ranksep 80
+legend right
+  Noir : version 1
+  <color:green>Vert : ajouts de la version 2</color>
+endlegend
+
+[*] --> Empty : curseur en 0
+Empty --> Filled : extendSelection
+Empty --> Empty : moveCursor, insert, backspace,\npaste, copy, cut
+Filled --> Filled : extendSelection,\ncopy
+Filled --> Empty : moveCursor, insert,\nbackspace, cut, paste
+
+Empty -[#green]-> Filled : <color:green>undo, redo
+Filled -[#green]-> Empty : <color:green>undo, redo
+Empty -[#green]-> Empty : <color:green>undo, redo
+Filled -[#green]-> Filled : <color:green>undo, redo
+@enduml
+

@@ -1,0 +1,11 @@
+@startuml
+title États du Clipboard
+legend right
+  <color:black>Noir : version 1</color>
+endlegend
+
+[*] --> Empty : création
+Empty --> Filled : copy(), cut() [sélection non vide]
+Filled --> Filled : copy(), cut() [sélection non vide]
+@enduml
+

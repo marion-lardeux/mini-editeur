@@ -1,0 +1,21 @@
+@startuml
+title États de l'enregistrement
+skinparam nodesep 80
+skinparam ranksep 80
+skinparam state {
+  BackgroundColor #D5F5D5
+  BorderColor green
+}
+skinparam ArrowColor green
+skinparam ArrowFontColor green
+legend right
+  <color:green>Vert : nouveau en version 2</color>
+endlegend
+
+[*] --> Stopped
+Stopped --> Recording : Ctrl+R\n(script vidé)
+Recording --> Stopped : Ctrl+R
+Recording --> Recording : action\n(ajoutée au script)
+Stopped --> Stopped : replay\n(script rejoué)
+@enduml
+

@@ -1,0 +1,38 @@
+@startuml
+title États de l'historique
+skinparam nodesep 70
+skinparam ranksep 70
+skinparam state {
+  BackgroundColor #D5F5D5
+  BorderColor green
+}
+skinparam ArrowColor green
+skinparam ArrowFontColor green
+legend right
+  <color:green>Vert : nouveau en version 2</color>
+endlegend
+
+state Historique {
+  state "Pile à défaire\nvide" as UEmpty
+  state "Pile à défaire\nnon vide" as UFull
+  [*] --> UEmpty
+  UEmpty --> UFull : action, redo
+  UFull --> UFull : action, redo,\nundo [reste]
+  UFull --> UEmpty : undo [dernière]
+
+  --
+
+  state "Pile à rétablir\nvide" as REmpty
+  state "Pile à rétablir\nnon vide" as RFull
+  [*] --> REmpty
+  REmpty --> RFull : undo
+  RFull --> RFull : undo,\nredo [reste]
+  RFull --> REmpty : action,\nredo [dernière]
+}
+
+note bottom of Historique
+  action = saisie, suppression, coupe ou collage qui change le texte.
+  Copie, déplacement et undo/redo sur pile vide : sans effet.
+end note
+@enduml
+
