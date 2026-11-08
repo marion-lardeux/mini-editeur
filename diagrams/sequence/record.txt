@@ -1,0 +1,58 @@
+@startuml
+title Enregistrer des actions (v2)
+skinparam sequenceArrowColor green
+skinparam sequenceLifeLineBorderColor green
+skinparam ParticipantBackgroundColor #D5F5D5
+skinparam ParticipantBorderColor green
+
+actor User
+participant "KeyboardHandler\nConsoleInputHandler" as K
+participant EditorController as EC
+participant CommandManager as CM
+participant EditorEngine as EE
+
+== Démarrer l'enregistrement ==
+User -> K : Ctrl+R
+activate K
+K -> EC : toggleRecording()
+deactivate K
+activate EC
+EC -> CM : isRecording()
+activate CM
+EC <-- CM : false
+EC -> CM : startRecording()
+deactivate EC
+CM -> CM : script.clear()
+CM -> CM : recording = true
+deactivate CM
+
+== Pendant l'enregistrement : une action (ex. saisie) ==
+User -> K : touche
+activate K
+K -> EC : insert(s)
+deactivate K
+activate EC
+EC -> CM : execute(cmd, undoable)
+deactivate EC
+activate CM
+CM -> EE : exécute la commande\n(cf. diagramme « Saisir du texte »)
+activate EE
+deactivate EE
+CM -> CM : script.add(new Step(cmd, undoable))
+deactivate CM
+
+== Arrêter l'enregistrement ==
+User -> K : Ctrl+R
+activate K
+K -> EC : toggleRecording()
+deactivate K
+activate EC
+EC -> CM : isRecording()
+activate CM
+EC <-- CM : true
+EC -> CM : stopRecording()
+deactivate EC
+CM -> CM : recording = false
+deactivate CM
+@enduml
+

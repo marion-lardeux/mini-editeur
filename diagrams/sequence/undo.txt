@@ -1,0 +1,58 @@
+@startuml
+title Annuler une action (v2)
+skinparam sequenceArrowColor green
+skinparam sequenceLifeLineBorderColor green
+skinparam ParticipantBackgroundColor #D5F5D5
+skinparam ParticipantBorderColor green
+
+actor User
+participant "KeyboardHandler\nConsoleInputHandler" as K
+participant EditorController as EC
+participant CommandManager as CM
+participant EditorEngine as EE
+entity selectionx as S
+note over S : selectionx:Selection
+entity bufferx as B
+note over B : bufferx:Buffer
+participant EditorMemento as EM
+participant "SwingView\nConsoleView" as V
+
+User -> K : Ctrl+Z
+activate K
+K -> EC : undo()
+deactivate K
+activate EC
+EC -> CM : undo()
+deactivate EC
+activate CM
+
+alt undoStack non vide
+  CM -> EE : save()
+  activate EE
+  EE -> EM : new EditorMemento(...)
+  activate EM
+  CM <-- EE : état courant
+  CM -> CM : redoStack.push(état courant)
+  CM -> CM : undoStack.pop()
+  CM -> EE : restore(m)
+  deactivate CM
+  EE -> EM : text(), start(), end(), anchor()
+  deactivate EM
+  EE -> B : setText(text)
+  activate B
+  deactivate B
+  EE -> S : restore(start, end, anchor)
+  activate S
+  deactivate S
+  EE -> EE : notifyObservers()
+  EE -> V : update()
+  deactivate EE
+  activate V
+  V -> V : render()
+  User <-- V : éditeur avant l'action
+  deactivate V
+else undoStack vide
+  note over CM : rien ne se passe
+end
+@enduml
+

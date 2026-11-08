@@ -1,0 +1,75 @@
+@startuml
+title Coller du texte (v1 + v2)
+actor User
+participant "KeyboardHandle\nConsoleInputHandler" as K
+participant EditorController as EC
+participant CommandManager as CM #D5F5D5
+participant EditorEngine as EE
+entity clipboardx as C
+note over C : clipboardx:Clipboard
+entity selectionx as S
+note over S : selectionx:Selection
+entity bufferx as B
+note over B : bufferx:Buffer
+participant EditorMemento as EM #D5F5D5
+participant "SwingView\nConsoleView" as V
+
+User -> K : Ctrl + V
+activate K
+K -> EC : paste()
+deactivate K
+activate EC
+note right of EC : v1 : EC appelle directement EE.paste()
+
+EC -[#green]> CM : <color:green>execute(cmd, true)</color>
+deactivate EC
+activate CM
+
+CM -[#green]> EE : <color:green>save()</color>
+activate EE
+EE -[#green]> EM : <color:green>new EditorMemento(...)</color>
+activate EM
+CM <-[#green]- EE : <color:green>before</color>
+
+CM -> EE : paste()\n<color:green>(via cmd.execute())</color>
+
+alt presse-papier non vide
+  EE -> C : get()
+  activate C
+  EE <-- C : texte
+  deactivate C
+  EE -> EE : replaceSelection(texte)
+  EE -> S : getStart()
+  activate S
+  EE <-- S : start
+  EE -> S : getEnd()
+  EE <-- S : end
+  EE -> B : delete(start, end)
+  activate B
+  EE -> B : insert(start, texte)
+  deactivate B
+  note over EE : pos = start + texte.length()
+  EE -> S : set(pos, pos)
+  deactivate S
+  EE -> EE : notifyObservers()
+  EE -> V : update()
+  activate V
+  V -> V : render()
+  User <-- V : éditeur après collage
+  deactivate V
+else presse-papier vide
+  note over EE : rien ne se passe
+end
+
+CM -[#green]> EE : <color:green>save()</color>
+CM <-[#green]- EE : <color:green>after</color>
+deactivate EE
+CM -[#green]> EM : <color:green>before.sameText(after)</color>
+deactivate EM
+alt <color:green>texte modifié</color>
+  CM -[#green]> CM : <color:green>undoStack.push(before)</color>
+  CM -[#green]> CM : <color:green>redoStack.clear()</color>
+end
+deactivate CM
+@enduml
+

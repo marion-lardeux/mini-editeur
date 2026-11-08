@@ -1,0 +1,65 @@
+@startuml
+title Couper du texte (v1 + v2)
+actor User
+participant "KeyboardHandle\nConsoleInputHandler" as K
+participant EditorController as EC
+participant CommandManager as CM #D5F5D5
+participant EditorEngine as EE
+entity selectionx as S
+note over S : selectionx:Selection
+entity bufferx as B
+note over B : bufferx:Buffer
+participant EditorMemento as EM #D5F5D5
+participant "SwingView\nConsoleView" as V
+
+User -> K : Ctrl + X
+activate K
+K -> EC : cut()
+deactivate K
+activate EC
+note right of EC : v1 : EC appelle directement EE.cut()
+
+EC -[#green]> CM : <color:green>execute(cmd, true)</color>
+deactivate EC
+activate CM
+
+CM -[#green]> EE : <color:green>save()</color>
+activate EE
+EE -[#green]> EM : <color:green>new EditorMemento(...)</color>
+activate EM
+EE -[#green]-> CM : <color:green>before</color>
+
+CM -> EE : cut()\n<color:green>(via cmd.execute())</color>
+
+alt sélection non vide
+  EE -> EE : copy()
+  note right of EE : voir le diagramme "Copier"\n(texte envoyé au presse-papier)
+  EE -> S : getStart()
+  EE <-- S : start
+  EE -> S : getEnd()
+  EE <-- S : end
+  EE -> B : delete(start, end)
+  EE -> S : set(start, start)
+  EE -> EE : notifyObservers()
+  EE -> V : update()
+  activate V
+  V -> V : render()
+  User <-- V : éditeur après coupe
+  deactivate V
+  
+else sélection vide
+  note over EE : buffer et presse-papier inchangés
+end
+
+CM -[#green]> EE : <color:green>save()</color>
+CM <-[#green]- EE : <color:green>after</color>
+deactivate EE
+CM -[#green]> EM : <color:green>before.sameText(after)</color>
+deactivate EM
+alt <color:green>texte modifié</color>
+  CM -[#green]> CM : <color:green>undoStack.push(before)</color>
+  CM -[#green]> CM : <color:green>redoStack.clear()</color>
+end
+deactivate CM
+@enduml
+

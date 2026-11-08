@@ -1,0 +1,54 @@
+@startuml
+title Déplacer la sélection (v1 + v2)
+actor User
+participant "KeyboardHandle\nConsoleInputHandler" as K
+participant EditorController as EC
+participant CommandManager as CM #D5F5D5
+participant EditorEngine as EE
+entity selectionx as S
+note over S : selectionx:Selection
+entity bufferx as B
+note over B : bufferx:Buffer
+participant "SwingView\nConsoleView" as V
+
+User -> K : Maj + ← ou →
+activate K
+K -> EC : extendSelection(delta)
+deactivate K
+activate EC
+note right of EC : v1 : EC appelle directement EE.extendSelection(delta)
+
+EC -[#green]> CM : <color:green>execute(cmd, false)</color>
+deactivate EC
+activate CM
+CM -> EE : extendSelection(delta)\n<color:green>(via cmd.execute())</color>
+deactivate CM
+activate EE
+
+EE -> S : getAnchor()
+activate S
+EE <-- S : anchor
+EE -> S : getStart()
+EE <-- S : start
+opt start == anchor
+  EE -> S : getEnd()
+  EE <-- S : end
+end
+
+note right of EE : active = (start == anchor) ? end : start
+EE -> B : length()
+activate B
+EE <-- B : longueur
+deactivate B
+note right of EE : newActive = clamp(active + delta, 0, longueur)
+EE -> S : select(anchor, newActive)
+deactivate S
+EE -> EE : notifyObservers()
+EE -> V : update()
+deactivate EE
+activate V
+V -> V : render()
+User <-- V : éditeur après déplacement
+deactivate V
+@enduml
+

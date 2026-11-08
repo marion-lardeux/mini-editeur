@@ -1,0 +1,39 @@
+@startuml
+title Rejouer des actions (v2)
+skinparam sequenceArrowColor green
+skinparam sequenceLifeLineBorderColor green
+skinparam ParticipantBackgroundColor #D5F5D5
+skinparam ParticipantBorderColor green
+
+actor User
+participant "KeyboardHandler\nConsoleInputHandler" as K
+participant EditorController as EC
+participant CommandManager as CM
+participant EditorEngine as EE
+participant "SwingView\nConsoleView" as V
+
+User -> K : Ctrl+P
+activate K
+K -> EC : replay()
+deactivate K
+activate EC
+EC -> CM : replay()
+deactivate EC
+activate CM
+
+alt enregistrement en cours
+  note over CM : replay ignoré
+else enregistrement arrêté
+  loop pour chaque Step du script
+    CM -> CM : execute(step.command(), step.undoable())
+    CM -> EE : exécute la commande enregistré\n (cf. diagramme de la commande)
+    deactivate CM
+    activate EE
+    EE -> V : update()
+    deactivate EE
+    activate V
+  end
+  User <-- V : éditeur après le rejeu
+  deactivate V
+end
+@enduml
