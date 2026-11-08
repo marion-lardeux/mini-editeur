@@ -23,9 +23,6 @@ construit et se lance indépendamment de l'autre.
 ```
 mini-editeur/
 ├── README.md                      ce fichier
-├── docs/                          dossier de conception : modèles UML de chaque version
-│   ├── v1/uml/                    classes.puml, classes.png
-│   └── v2/uml/                    classes.puml, classes.png
 ├── v1/                            VERSION 1
 │   ├── pom.xml
 │   └── src/
