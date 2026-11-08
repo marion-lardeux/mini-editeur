@@ -1,0 +1,189 @@
+@startuml
+title Mini-éditeur - Diagramme de classes
+skinparam classAttributeIconSize 0
+skinparam packageStyle folder
+skinparam nodesep 10
+skinparam ranksep 20
+skinparam padding 1
+skinparam packagePadding 5
+
+package "Model" {
+  interface EditorObserver {
+    +update()
+  }
+  interface EditorReader {
+    +getText() : String
+    +getSelStart() : int
+    +getSelEnd() : int
+  }
+  class Buffer {
+    -content : StringBuilder
+    +insert(pos:int, s:String)
+    +delete(start:int, end:int)
+    +substring(start:int, end:int) : String
+    +length() : int
+    +getText() : String
+    <color:green>setText(String s)</color>
+  }
+  class Selection {
+    -start : int
+    -end : int
+    -anchor : int
+    +getStart() : int
+    +getEnd() : int
+    +getAnchor() : int
+    +set(start:int, end:int)
+    +select(anchor:int, active:int)
+    <color:green>restore(int start, int end, int anchor)</color>
+    +isEmpty() : boolean
+  }
+  class Clipboard {
+    -content : String
+    +set(s:String)
+    +get() : String
+    +isEmpty() : boolean
+  }
+  class EditorEngine {
+    <color:green>buffer : Buffer</color>
+    <color:green>selection : Selection</color>
+    <color:green>clipboard : Clipboard</color>
+    -observers : List<EditorObserver>
+    +copy()
+    +cut()
+    +paste()
+    +insert(s:String)
+    +backspace()
+    +moveCursor(delta:int)
+    +extendSelection(delta:int)
+    <color:green>+save() : EditorMemento</color>
+    <color:green>+restore(EditorMemento m)</color>
+    +addObserver(o:EditorObserver)
+    +notifyObservers()
+    +getText() : String
+    +getSelStart() : int
+    +getSelEnd() : int
+    -replaceSelection(s:String)
+    -clamp(i:int, min:int, max:int) : int
+  }
+  class EditorMemento {
+    <color:green>-text : String</color>
+    <color:green>-start : int</color>
+    <color:green>-end : int</color>
+    <color:green>-anchor : int</color>
+    <color:green>text() : String</color>
+    <color:green>start() : int</color>
+    <color:green>end() : int</color>
+    <color:green>anchor() : int</color>
+    <color:green>+sameText(EditorMemento other) : boolean</color>
+  }
+}
+
+package "Vue (au choix : graphique ou textuelle)" {
+
+  package "Interface graphique (Swing)" #EAF2FF {
+    class SwingView {
+      -SELECTION_PAINTER : HighlightPainter
+      -reader : EditorReader
+      -pane : EditorPane
+      +update()
+      +getComponent() : JComponent
+      +render()
+    }
+    class KeyboardHandler {
+      +install(c:JComponent)
+    }
+  }
+
+  package "Interface textuelle (Console)" #FFF4E0 {
+    class ConsoleView {
+      +update()
+      +render()
+    }
+    class ConsoleInputHandler {
+      +install()
+    }
+  }
+}
+
+package "Controller" {
+  class EditorController {
+    +copy()
+    +cut()
+    +paste()
+    +insert(s:String)
+    +backspace()
+    +moveCursor(delta:int)
+    +extendSelection(delta:int)
+    <color:green>+undo()</color>
+    <color:green>+redo()</color>
+    <color:green>+toggleRecording()</color>
+    <color:green>+replay()</color>
+  }
+}
+
+package "Command" {
+  class Command {
+    <color:green>-execute()</color>
+  }
+  class CommandManager {
+    <color:green>-engine : EditorEngine</color>
+    <color:green>-undoStack : Deque<EditorMemento></color>
+    <color:green>-redoStack : Deque<EditorMemento></color>
+    <color:green>-script : List<Step></color>
+    <color:green>-recording : boolean</color>
+    <color:green>+execute(Command c, boolean undoable)</color>
+    <color:green>undo()</color>
+    <color:green>redo()</color>
+    <color:green>startRecording()</color>
+    <color:green>stopRecording()</color>
+    <color:green>replay()</color>
+    <color:green>isRecording() : boolean</color>
+    <color:green>canUndo() : boolean</color>
+    <color:green>canredo() : boolean</color>
+    <color:green>scriptSize() : int</color>
+  }
+}
+
+class Main {
+  -HELP : String
+  +main(args:String[])
+  -start()
+}
+
+' --- Modèle ---
+EditorEngine *-- Buffer
+EditorEngine *-- Selection
+EditorEngine *-- Clipboard
+EditorEngine o-- "*" EditorObserver : observateurs
+EditorEngine ..|> EditorReader
+
+' --- Vue graphique ---
+SwingView ..|> EditorObserver
+SwingView --> EditorReader : lit l'état
+KeyboardHandler --> EditorController : appelle
+KeyboardHandler ..> SwingView : se branche sur\n son composant
+
+' --- Vue textuelle ---
+ConsoleView ..|> EditorObserver
+ConsoleView --> EditorReader : lit l'état
+ConsoleInputHandler --> EditorController : appelle
+
+' --- Contrôleur ---
+EditorController --> EditorEngine : transmet
+
+' --- Ajouts v2 : Command et Memento ---
+EditorController -[#green]-> CommandManager : délègue
+CommandManager -[#green]-> EditorEngine : pilote
+CommandManager o-[#green]- EditorMemento
+EditorEngine ..[#green]> EditorMemento
+
+' --- Main ---
+Main ..> EditorEngine
+Main ..> EditorController
+Main ..[#green]> CommandManager
+Main ..> SwingView
+Main ..> KeyboardHandler
+Main ..> ConsoleView
+Main ..> ConsoleInputHandler
+@enduml
+
