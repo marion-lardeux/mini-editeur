@@ -1,0 +1,44 @@
+@startuml
+title Mini-éditeur - Cas d'utilisation (v1 + v2)
+left to right direction
+
+actor User
+
+rectangle "Mini-éditeur" {
+  usecase "Saisir du texte" as UC1
+  usecase "Supprimer du texte" as UC2
+  usecase "Déplacer le curseur" as UC3
+  usecase "Déplacer les bornes\nde sélection" as UC4
+  usecase "Copier du texte" as UC5
+  usecase "Couper du texte" as UC6
+  usecase "Coller du texte" as UC7
+  usecase "Annuler une action" as UC8 #LightGreen
+  usecase "Rétablir une action" as UC9 #LightGreen
+  usecase "Enregistrer des actions" as UC10 #LightGreen
+  usecase "Rejouer le script" as UC11 #LightGreen
+}
+
+User --> UC1
+User --> UC2
+User --> UC3
+User --> UC4
+User --> UC5
+User --> UC6
+User --> UC7
+User --> UC8
+User --> UC9
+User --> UC10
+User --> UC11
+
+UC6 ..> UC2 : <<includes>>
+UC1 ..> UC3 : <<includes>>
+UC2 ..> UC3 : <<includes>>
+UC7 ..> UC3 : <<includes>>
+UC4 ..> UC3 : <<include>>
+UC6 ..> UC5 : <<includes>>
+
+legend right
+  Vert : cas ajoutés en V2
+endlegend
+@enduml
+
